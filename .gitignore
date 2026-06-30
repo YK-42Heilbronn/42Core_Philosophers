@@ -1,0 +1,7 @@
+.docs/
+.examples/
+.excludes/
+philo_exe
+.vscode/
+
+
