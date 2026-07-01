@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/19 16:19:38 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/01 12:09:51 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/01 16:49:12 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,33 +15,33 @@
 // }
 void	fork_taken(t_philosopher *philo, suseconds_t time_us)
 {
-	pthread_mutex_lock(&(philo->print_mutex));
+	pthread_mutex_lock(&(philo->sim_data->print_mutex));
 	printf("%ld %d has taken a fork\n", time_us / 1000, philo->nr);
-	pthread_mutex_unlock(&(philo->print_mutex));
+	pthread_mutex_unlock(&(philo->sim_data->print_mutex));
 }
 
-void	eating(t_thread_context *t_context, suseconds_t time_us)
+void	eating(t_philosopher *philo, suseconds_t time_us)
 {
-	t_philosopher *philo;
-	t_lst *philo_node;
+	// t_philosopher *philo;
+	// t_lst *philo_node;
 
-	philo_node = t_context->philo;
-	philo = t_context->philo->philo;
-	if (!simulation_stops(t_context))
+	// philo_node = philo;
+	// philo = t_context->philo->philo;
+	if (!simulation_stops(philo))
 	{
 		pthread_mutex_lock(&(philo->reserve_resource));
-		update_forks_state(philo_node, 1); // taken
+		update_forks_state(philo, 1); // taken
 		usleep(philo->time_to_eat * 1000);
 		printf("%ld %d is eating\n", time_us / 1000, philo->nr);
-		update_forks_state(philo_node, 0); // returned
+		update_forks_state(philo, 0); // returned
 		pthread_mutex_unlock(&(philo->reserve_resource));
-		update_philo_meals_count(philo_node);  // increment meals count
-		update_philo_last_meal_taken(philo_node); // update last meal taken time
+		update_philo_meals_count(philo);  // increment meals count
+		update_philo_last_meal_taken(philo); // update last meal taken time
 	}
-	end_threads(t_context->sim_data);
+	end_threads(philo);
 }
 
-void	sleeping(t_thread_context *t_context, suseconds_t time_us)
+void	sleeping(t_philosopher *philo, suseconds_t time_us)
 {
 	t_philosopher *philo;
 
@@ -56,7 +56,7 @@ void	sleeping(t_thread_context *t_context, suseconds_t time_us)
 	end_threads(t_context->sim_data);
 }
 
-void	thinking(t_thread_context *t_context, suseconds_t time_us)
+void	thinking(t_philosopher *philo, suseconds_t time_us)
 {
 	t_philosopher *philo;
 

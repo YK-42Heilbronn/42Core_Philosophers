@@ -12,7 +12,8 @@ SRC_OBJS_DIR = $(OBJS_DIR)/$(MANDATORY_DIR)
 # ------- Mandatory -------
 SRC_HEADER_FILES = philo.h
 SRC_HEADER = $(MANDATORY_DIR)/$(SRC_HEADER_FILES)
-SRC_FILES = utils.c states.c states_update.c parsing.c lnk_list/lnk_list.c philo.c
+# SRC_FILES = utils.c states.c states_update.c parsing.c lnk_list/lnk_list.c philo.c
+SRC_FILES = utils.c parsing.c lnk_list/lnk_list.c philo.c
 SRCS = $(addprefix $(MANDATORY_DIR)/,$(SRC_FILES))
 OBJ_FILES = $(SRCS:.c=.o)  # creates .o file names as .c, does not compile
 OBJS = $(addprefix $(OBJS_DIR)/,$(OBJ_FILES))
