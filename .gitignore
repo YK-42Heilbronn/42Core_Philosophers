@@ -5,6 +5,7 @@
 .excludes/
 philo_exe
 .vscode/
+.test/
 
 # Prerequisites
 *.d
