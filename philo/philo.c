@@ -6,31 +6,11 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/13 13:05:35 by ykonka            #+#    #+#             */
-/*   Updated: 2026/06/30 15:19:09 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/01 12:12:52 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-void	update_forks_state(t_lst *philo_node, int state)
-{
-	philo_node->philo->fork = state;
-	philo_node->next_philo->philo->fork = state;
-	if (state == 1)
-		fork_taken(philo_node->philo, current_time());
-}
-
-void	update_philo_meals_count(t_lst *philo_node)
-{
-	philo_node->philo->meals_count++;
-}
-
-void	update_philo_last_meal_taken(t_lst *philo_node)
-{
-	pthread_mutex_lock(&(philo_node->philo->meal_mutex));
-	philo_node->philo->last_meal_taken = current_time();
-	pthread_mutex_unlock(&(philo_node->philo->meal_mutex));
-}
 
 suseconds_t	time_elapsed_in_sim(suseconds_t start_time,
 		suseconds_t current_time)
@@ -46,7 +26,7 @@ int	simulation_stops(t_thread_context *t_context)
 	// printf("in simulation stops\n");
 	if (is_all_philos_reached_minimum_meals(t_context->sim_data) || is_philo_dead(philo))
 	{
-		died(philo, current_time());
+		// died(philo, current_time()-philo->sim_start_time);
 		pthread_mutex_lock(&(philo->sim_stop_mutex));
 		philo->sim_stopped = 1;
 		pthread_mutex_unlock(&(philo->sim_stop_mutex));
@@ -69,26 +49,28 @@ int	is_all_philos_reached_minimum_meals(t_simulation *sim_data)
 {
 	t_lst	*nxt_philo;
 	int		nr_philos;
-	int		all_reached_minimum_meals;
+	// int		all_reached_minimum_meals;
+	suseconds_t sim_start_time;
 
 	nxt_philo = sim_data->philosophers;
 	nr_philos = 0;
-	all_reached_minimum_meals = 1;
+	sim_data->all_eaten_min_meals = 1;
+	sim_start_time = nxt_philo->philo->sim_start_time;
 	while (nr_philos++ < sim_data->nr_of_philos)
 	{
 		if (nxt_philo->philo->minimum_meals > 0
 			&& nxt_philo->philo->meals_count < nxt_philo->philo->minimum_meals)
 		{
-			all_reached_minimum_meals = 0;
+			sim_data->all_eaten_min_meals = 0;
 			break ;
 		}
 		nxt_philo = nxt_philo->next_philo;
 	}
-	if (all_reached_minimum_meals)
+	if (sim_data->all_eaten_min_meals)
 	{
-		died(nxt_philo->philo, current_time());
+		died(nxt_philo->philo, current_time() - sim_start_time);
 	}
-	return (all_reached_minimum_meals);
+	return (sim_data->all_eaten_min_meals);
 }
 
 int	is_philo_dead(t_philosopher *philo)
@@ -99,7 +81,7 @@ int	is_philo_dead(t_philosopher *philo)
 			current_time());
 	if (time_since_last_meal >= philo->time_to_die * 1000)
 	{
-		died(philo, current_time());
+		died(philo, current_time() - philo->sim_start_time);
 		return (1);
 	}
 	return (0);

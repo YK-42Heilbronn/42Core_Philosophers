@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/14 12:18:35 by ykonka            #+#    #+#             */
-/*   Updated: 2026/06/30 15:40:26 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/01 13:45:29 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,14 +40,13 @@ typedef struct s_philosopher
 	int time_to_die;             // milliseconds
 	int time_to_eat;             // milliseconds
 	int time_to_sleep;           // milliseconds
-	int all_eaten_min_meals;
 	int				sim_stopped;
 	suseconds_t sim_start_time;  // if current_time - sim_start_time >= time_to_die, stop simulation
 	pthread_mutex_t	reserve_resource;
 	pthread_mutex_t print_mutex;
 	pthread_mutex_t meal_mutex;
 	pthread_mutex_t sim_stop_mutex;
-	pthread_mutex_t last_meal_taken_mutex;
+	pthread_mutex_t last_meal_mutex;
 	pthread_t routine; // thread handles both start - end mechanisms
 }					t_philosopher;
 
@@ -64,6 +63,7 @@ typedef struct s_simulation
 	int				sleep_duration;
 	int				time_to_die;
 	int				minimum_meals;
+	int all_eaten_min_meals;
 	suseconds_t		start_time;
 	t_lst			*philosophers;
 }					t_simulation;
@@ -103,9 +103,12 @@ void				ft_lstclear(t_lst **lst, void (*del)(void *));
 
 // main.c
 int					simulation_stops(t_thread_context *t_context);
-void				update_forks_state(t_lst *philo_node, int state);
-void				update_philo_meals_count(t_lst *philo_node);
-void				update_philo_last_meal_taken(t_lst *philo_node);
 void end_threads(t_simulation *sim_data);
 int	is_all_philos_reached_minimum_meals(t_simulation *sim_data);
 int	is_philo_dead(t_philosopher *philo);
+
+// states_update.c
+void				update_forks_state(t_lst *philo_node, int state);
+void				update_philo_meals_count(t_lst *philo_node);
+void				update_philo_last_meal_taken(t_lst *philo_node);
+
