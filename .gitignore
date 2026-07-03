@@ -6,6 +6,7 @@
 philo_exe
 .vscode/
 .test/
+philo/threads/
 
 # Prerequisites
 *.d

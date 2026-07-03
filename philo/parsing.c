@@ -6,13 +6,28 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/25 13:14:49 by ykonka            #+#    #+#             */
-/*   Updated: 2026/06/27 10:47:40 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/03 15:29:05 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	ft_atoi(const char *str)
+static int	ft_atoi(const char *str, long *val)
+{
+	long	result;
+
+	result = 0;
+	while (*str >= '0' && *str <= '9')
+		result = (result * 10) + (*str++ - 48);
+	if (*str == '\0')
+	{
+		*val = result;
+		return (1);
+	}
+	return (0);
+}
+
+int	ft_satoi(const char *str)
 {
 	int		minus;
 	long	result;
@@ -27,12 +42,21 @@ int	ft_atoi(const char *str)
 		minus = 44 - *str;
 		str++;
 	}
-	while (*str >= 48 && *str <= 57)
-		result = (result * 10) + (*str++ - 48);
-	return (result * minus);
+	if (ft_atoi(str, &result) == 1 && minus == 1)
+		return (result * minus);
+	else
+		return (-1);
 }
 
-// void parse_argvs()
-// {
-	
-// }
+int	parse_argv(char *argv[], int *philos, int *die_t, int *eat_t, int *sleep_t)
+{
+	*philos = ft_satoi(argv[1]);
+	*die_t = ft_satoi(argv[2]);
+	*eat_t = ft_satoi(argv[3]);
+	*sleep_t = ft_satoi(argv[4]);
+	// *min_meals = ft_satoi(argv[5]);
+	// if philos == 0, then no simulation
+	if (*philos <= 0 || *die_t == -1 || *eat_t == -1 || *sleep_t == -1)
+		return (1);
+	return (0);
+}

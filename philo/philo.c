@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/13 13:05:35 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/01 16:45:36 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/03 15:23:14 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,70 +18,124 @@ suseconds_t	time_elapsed_in_sim(suseconds_t start_time,
 	return (current_time - start_time);
 }
 
-int	simulation_stops(t_philosopher *philo)
+int get_sim_stopped(t_simulation *sim_data)
+{
+	int stopped;
+
+	pthread_mutex_lock(&(sim_data->state_mutex));
+	stopped = sim_data->sim_stopped;
+	pthread_mutex_unlock(&(sim_data->state_mutex));
+	return (stopped);
+}
+
+void set_sim_stopped(t_simulation *sim_data, int value)
+{
+	pthread_mutex_lock(&(sim_data->state_mutex));
+	sim_data->sim_stopped = value;
+	pthread_mutex_unlock(&(sim_data->state_mutex));
+}
+
+int get_all_eaten_min_meals(t_simulation *sim_data)
+{
+	int all_eaten;
+
+	pthread_mutex_lock(&(sim_data->state_mutex));
+	all_eaten = sim_data->all_eaten_min_meals;
+	pthread_mutex_unlock(&(sim_data->state_mutex));
+	return (all_eaten);
+}
+
+int	simulation_stops(t_lst *philo_node)
 {
 	t_philosopher	*philo;
 
-	philo = t_context->philo->philo;
+	philo = philo_node->philo;
 	// printf("in simulation stops\n");
-	if (is_all_philos_reached_minimum_meals(t_context->sim_data) || is_philo_dead(philo))
+	// set_sim_stopped(philo->sim_data, 0);
+	if (get_sim_stopped(philo->sim_data))
 	{
-		// died(philo, current_time()-philo->sim_start_time);
-		pthread_mutex_lock(&(philo->sim_stop_mutex));
-		philo->sim_stopped = 1;
-		pthread_mutex_unlock(&(philo->sim_stop_mutex));
+		return (get_sim_stopped(philo->sim_data));
 	}
-	// else if ()
+	// // printf("in simulation stops: sim_stopped:: before%d\n", philo->sim_data->sim_stopped);
+	// stop = is_all_philos_reached_minimum_meals(philo_node)
+	// 	|| is_philo_dead(philo_node);
+	// // printf("in simulation stops: sim_stopped:: after%d\n", philo->sim_data->sim_stopped);
+	// set_sim_stopped(philo->sim_data, stop);
+	// if (get_sim_stopped(philo->sim_data))
 	// {
-	// 	died(philo, current_time());
-	// 	t_context->sim_stopped = 1;
+	// 	died(philo_node);
 	// }
-	else
+	if (is_philo_dead(philo_node))
 	{
-		pthread_mutex_lock(&(philo->sim_stop_mutex));
-		philo->sim_stopped = 0;
-		pthread_mutex_unlock(&(philo->sim_stop_mutex));
+		set_sim_stopped(philo->sim_data, 1);
+		died(philo_node);
+		return (get_sim_stopped(philo->sim_data));
 	}
-	return (philo->sim_stopped);
+	if (is_all_philos_reached_minimum_meals(philo_node))
+	{
+		set_sim_stopped(philo->sim_data, 1);
+		return (get_sim_stopped(philo->sim_data));
+	}
+	// if (is_all_philos_reached_minimum_meals(philo_node) || is_philo_dead(philo_node))
+	// {
+	// 	// died(philo, current_time()-philo->sim_start_time);
+	// 	pthread_mutex_lock(&(philo->sim_data->state_mutex));
+	// 	philo->sim_data->sim_stopped = 1;
+	// 	died(philo_node);
+	// 	pthread_mutex_unlock(&(philo->sim_data->state_mutex));
+	// }
+	// // else if ()
+	// // {
+	// // 	died(philo, current_time());
+	// // 	t_context->sim_stopped = 1;
+	// // }
+	// else
+	// {
+	// 	pthread_mutex_lock(&(philo->sim_data->state_mutex));
+	// 	philo->sim_data->sim_stopped = 0;
+	// 	pthread_mutex_unlock(&(philo->sim_data->state_mutex));
+	// }
+	// printf("in simulation stops: sim_stopped:: end%d\n", philo->sim_data->sim_stopped);
+	return (get_sim_stopped(philo->sim_data));
 }
 
-int	is_all_philos_reached_minimum_meals(t_philosopher *philo)
+int	is_all_philos_reached_minimum_meals(t_lst *philo_node)
 {
+	t_simulation *sim_data;
 	t_lst	*nxt_philo;
 	int		nr_philos;
-	// int		all_reached_minimum_meals;
-	suseconds_t sim_start_time;
 
+	sim_data = philo_node->philo->sim_data;
 	nxt_philo = sim_data->philosophers;
 	nr_philos = 0;
-	sim_data->all_eaten_min_meals = 1;
-	sim_start_time = nxt_philo->philo->sim_start_time;
+	if (sim_data->minimum_meals <= 0)
+		return (0);
+	update_all_eaten_min_meals(sim_data, 1);
 	while (nr_philos++ < sim_data->nr_of_philos)
 	{
-		if (nxt_philo->philo->minimum_meals > 0
-			&& nxt_philo->philo->meals_count < nxt_philo->philo->minimum_meals)
+		if (nxt_philo->philo->meals_count < sim_data->minimum_meals)
 		{
-			sim_data->all_eaten_min_meals = 0;
-			break ;
+			update_all_eaten_min_meals(sim_data, 0);
+			break;
 		}
 		nxt_philo = nxt_philo->next_philo;
 	}
-	if (sim_data->all_eaten_min_meals)
-	{
-		died(nxt_philo->philo, current_time() - sim_start_time);
-	}
-	return (sim_data->all_eaten_min_meals);
+	// printf("philo_all_eaten:: %d\n", sim_data->all_eaten_min_meals);
+	return (get_all_eaten_min_meals(sim_data));
 }
 
-int	is_philo_dead(t_philosopher *philo)
+int	is_philo_dead(t_lst *philo_node)
 {
+	t_philosopher *philo;
 	suseconds_t	time_since_last_meal;
+	philo = philo_node->philo;
 
 	time_since_last_meal = time_elapsed_in_sim(philo->last_meal_taken,
 			current_time());
+	// printf("in is_philo_dead\n");
+	// printf("last meal:: %ld %d\n", time_since_last_meal, philo->time_to_die * 1000);
 	if (time_since_last_meal >= philo->time_to_die * 1000)
 	{
-		died(philo, current_time() - philo->sim_start_time);
 		return (1);
 	}
 	return (0);
@@ -90,32 +144,39 @@ int	is_philo_dead(t_philosopher *philo)
 // create ds - existence
 // thread func
 // it is an routine of an single philosopher
-void	*philo_routine(void *philo)
+void	*philo_routine(void *p_node)
 {
 	t_lst				*philo_node;
 	// t_thread_context	*context;
 
 	// context = (t_thread_context *)t_context;
-	philo_node = (t_philosopher*)philo;
+	philo_node = (t_lst*)p_node;
 	while (1)
 	{
+		// printf("philo_routine: philo_nr:: %d\n", philo_node->philo->nr);
 		if (philo_node->philo->nr % 2 == 0)
 		{
-			// eating(t_context, current_time()
-			// 	- philo_node->philo->sim_start_time);
-			// sleeping(t_context, current_time()
-			// 	- philo_node->philo->sim_start_time);
-			// thinking(t_context, current_time()
-			// 	- philo_node->philo->sim_start_time);
+			if (get_sim_stopped(philo_node->philo->sim_data))
+				break;
+			eating(philo_node);
+			if (get_sim_stopped(philo_node->philo->sim_data))
+				break;
+			sleeping(philo_node);
+			if (get_sim_stopped(philo_node->philo->sim_data))
+				break;
+			thinking(philo_node);
 		}
 		else
 		{
-			// sleeping(t_context, current_time()
-			// 	- philo_node->philo->sim_start_time);
-			// thinking(t_context, current_time()
-			// 	- philo_node->philo->sim_start_time);
-			// eating(t_context, current_time()
-			// 	- philo_node->philo->sim_start_time);
+			if (get_sim_stopped(philo_node->philo->sim_data))
+				break;
+			sleeping(philo_node);
+			if (get_sim_stopped(philo_node->philo->sim_data))
+				break;
+			thinking(philo_node);
+			if (get_sim_stopped(philo_node->philo->sim_data))
+				break;
+			eating(philo_node);
 		}
 	}
 	return (NULL);
@@ -128,7 +189,6 @@ void	start_threads(t_simulation *sim_data)
 {
 	t_lst				*next;
 	int					nr_philos;
-	int status;
 
 	next = sim_data->philosophers;
 	nr_philos = 0;
@@ -142,7 +202,8 @@ void	start_threads(t_simulation *sim_data)
 		next->philo->last_meal_taken = sim_data->start_time;
 		// next->philo->sim_stopped = 0;
 		// context->philo = next;
-		status = pthread_create(&(next->philo->routine), NULL, &philo_routine, next->philo);
+		// status = pthread_create(&(next->philo->routine), NULL, &philo_routine, next);
+		pthread_create(&(next->philo->routine), NULL, &philo_routine, next);
 		// if (status != 0)
 		// {
 
@@ -170,40 +231,59 @@ void	simulation(t_simulation *sim_data)
 {
 	// printf("sim:set:before\n");
 	// set_philo_state_values(sim_data, die_time, eat_time, sleep_time);
-	// printf("sim:set:after\n");
+	// printf("sim:initialize:before\n");
 	initialize_philo_mutexes(sim_data);
 	// printf("bug in initialize mutex\n");
-	// printf("sim:while:before\n");
+	// printf("sim:start:before\n");
 	start_threads(sim_data);
+	// printf("sim:start:after\n");
 	end_threads(sim_data);
-	// printf("sim:while:after\n");
+	// printf("sim:end:after\n");
 	destroy_philo_mutexes(sim_data);
+	// printf("sim:destroy:after\n");
 }
 
 int	main(int argc, char *argv[])
 {
 	t_simulation	*sim_data;
+	int philos;
+	int die_t;
+	int eat_t;
+	int sleep_t;
+	int min_meals;
 
 	// t_philosopher *philo_head;
-	(void)argc;
-	sim_data = (t_simulation *)malloc(sizeof(t_simulation));
-	sim_data->nr_of_philos = ft_atoi(argv[1]);
-	sim_data->all_eaten_min_meals = 0;
-	sim_data->sim_stopped = 0;
-	// sim_data->time_to_die = ft_atoi(argv[2]);
-	// sim_data->eat_duration = ft_atoi(argv[3]);
-	// sim_data->sleep_duration = ft_atoi(argv[4]);
-	if (argc == 6)
-		sim_data->minimum_meals = ft_atoi(argv[5]);
+	if (argc == 5 || argc == 6)
+	{
+		if (parse_argv(argv, &philos, &die_t, &eat_t, &sleep_t) == 1)
+		{
+			printf("Error: invalid argument\n");
+			return (1);
+		}
+		sim_data = (t_simulation *)malloc(sizeof(t_simulation));
+		sim_data->nr_of_philos = philos;
+		sim_data->all_eaten_min_meals = 0;
+		sim_data->sim_stopped = 0;
+		if (argc == 6)
+		{
+			min_meals = ft_satoi(argv[5]);
+			if (min_meals == -1)
+			{
+				printf("Error: invalid argument\n");
+				return (1);
+			}
+			sim_data->minimum_meals = min_meals;
+		}
+		else
+			sim_data->minimum_meals = 0;
+		sim_data->philosophers = NULL;
+		initialize_philo_list(sim_data, die_t, eat_t, sleep_t);
+		simulation(sim_data);
+		return (0);
+	}
 	else
-		sim_data->minimum_meals = -1;
-	sim_data->philosophers = NULL;
-	// printf("%d %d %d %d\n", philo_nr, eat_duration, think_duration,
-	// sleep_duration);
-	// philo_head = (t_philosopher*)malloc(sizeof(t_philosopher)*philo_nr);
-	initialize_philo_list(sim_data, ft_atoi(argv[2]), ft_atoi(argv[3]), ft_atoi(argv[4]));
-	// printf("before\n");
-	simulation(sim_data);
-	// printf("after\n");
-	// print_philo_list(sim_data);
+	{
+		printf("Error: invalid number of arguments\n");
+		return (1);
+	}
 }

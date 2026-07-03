@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/19 15:08:00 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/01 16:17:21 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/03 13:38:56 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,23 @@ suseconds_t current_time(void)
     struct timeval tv;
 
     gettimeofday(&tv, NULL);
-    return ((suseconds_t)tv.tv_sec * 1000000 + tv.tv_usec);
+    return ((suseconds_t)tv.tv_sec * 1000000 + tv.tv_usec);  // in microseconds
 }
+
+// int smart_sleep(suseconds_t duration_ms, t_lst *philo_node)
+// {
+// 	suseconds_t	start_time;
+
+// 	start_time = current_time();
+// 	while ((current_time() - start_time) < duration_ms * 1000)
+// 	{
+// 		if (!simulation_stops(philo_node))
+// 			return (0);
+// 		usleep(500);
+// 	}
+// 	return (1);
+// }
+
 void now()
 {
 	time_t now = time(NULL);          // get current time in seconds since epoch
@@ -90,7 +105,7 @@ void	destroy_philo_mutexes(t_simulation *sim_data)
 	nr_philos = 0;
 	// sim mutexes
 	pthread_mutex_destroy(&(sim_data->print_mutex));
-	pthread_mutex_destroy(&(sim_data->sim_stop_mutex));
+	pthread_mutex_destroy(&(sim_data->state_mutex));
 	// each philo mutexes
 	while (nr_philos++ < sim_data->nr_of_philos)
 	{
@@ -110,7 +125,7 @@ void	initialize_philo_mutexes(t_simulation *sim_data)
 	nr_philos = 0;
 	// sim mutexes
 	pthread_mutex_init(&(sim_data->print_mutex), NULL);
-	pthread_mutex_init(&(sim_data->sim_stop_mutex), NULL);
+	pthread_mutex_init(&(sim_data->state_mutex), NULL);
 	// each philo mutexes
 	while (nr_philos++ < sim_data->nr_of_philos)
 	{
@@ -159,17 +174,18 @@ void	initialize_philo_list(t_simulation *sim_data, int time_to_die, int eat_dura
 		philo->time_to_eat = eat_duration;
 		philo->time_to_die = time_to_die;
 		philo->time_to_sleep = sleep_duration;
+		philo->sim_data = sim_data;
 		// printf("philo: %p - %d\n", philo, philo->nr);
 		ft_lstadd_back(&(sim_data->philosophers), new_lst(philo));
 		// printf("philo: %p - %d\n", philo, philo->nr);
 	}
 	// make linked list cyclic so that last_node next_node is set to first_node
-	philo_node = sim_data->philosophers;
-	while (philo_node->next_philo)
+	if (sim_data->nr_of_philos > 1)
 	{
-		// assign the sim_data pointer to each philosopher
-		philo_node->philo->sim_data = sim_data;
-		philo_node = philo_node->next_philo;
+		philo_node = sim_data->philosophers;
+		while (philo_node->next_philo)
+			philo_node = philo_node->next_philo;
+		philo_node->next_philo = sim_data->philosophers;
 	}
-	philo_node->next_philo = sim_data->philosophers;
 }
+
