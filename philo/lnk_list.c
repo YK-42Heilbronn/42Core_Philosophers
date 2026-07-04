@@ -6,11 +6,11 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/18 14:02:24 by ykonka            #+#    #+#             */
-/*   Updated: 2026/06/26 11:56:32 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/04 12:24:31 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../philo.h"
+#include "philo.h"
 
 t_lst	*new_lst(t_philosopher *philo)
 {

@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/14 12:18:35 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/03 16:32:46 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/04 14:46:05 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ typedef struct s_philosopher
 	pthread_mutex_t			last_meal_mutex;
 
 	pthread_t				routine;
-	t_simulation *sim_data; // NEW: back-pointer to global simulation
+	t_simulation			*sim_data;
 }							t_philosopher;
 
 typedef struct s_lst
@@ -43,30 +43,25 @@ typedef struct s_lst
 }							t_lst;
 
 typedef struct s_simulation
-{                            // global
-	int nr_of_philos;        // read-only after init
-	int minimum_meals;       // read-only after init
-	int all_eaten_min_meals; // read-write after init
-	int sim_stopped;         // read-write after init
+{
+	int						nr_of_philos;
+	int						minimum_meals;
+	int						all_eaten_min_meals;
+	int						sim_stopped;
 
-	suseconds_t start_time; // read-only after init
+	suseconds_t				start_time;
 
 	pthread_mutex_t			state_mutex;
 	pthread_mutex_t			print_mutex;
 
-	t_lst *philosophers; // head of linked list
+	t_lst					*philosophers;
 }							t_simulation;
 
-// utils.c
-suseconds_t					current_time(void);
-void						print_philo_list(t_simulation *sim_data);
-void						destroy_philo_mutexes(t_simulation *sim_data);
-void						initialize_philo_mutexes(t_simulation *sim_data);
-int							initialize_philo_list(t_simulation *sim_data,
-								int time_to_die, int eat_duration,
-								int sleep_duration);
-void						free_philo_lst(t_simulation *sim_data,
-								int nr_philos);
+// lnk_list.c
+t_lst						*new_lst(t_philosopher *philo);
+void						ft_lstadd_front(t_lst **lst, t_lst *new);
+void						ft_lstadd_back(t_lst **lst, t_lst *new);
+void						ft_lstclear(t_lst **lst, void (*del)(void *));
 
 // states.c
 void						fork_taken(t_lst *philo_node);
@@ -77,31 +72,42 @@ void						thinking(t_lst *philo_node);
 void						died(t_lst *philo_node);
 
 // parsing.c
-int							ft_satoi(const char *str);
-int							parse_argv(char *argv[], int *philos, int *die_t,
-								int *eat_t, int *sleep_t);
+int							parse_argv(char *argv[], int ind, int *ptr);
 
 // philo.c
-
-// lnk_list.c
-t_lst						*new_lst(t_philosopher *philo);
-void						ft_lstadd_front(t_lst **lst, t_lst *new);
-void						ft_lstadd_back(t_lst **lst, t_lst *new);
-void						ft_lstclear(t_lst **lst, void (*del)(void *));
-
-// main.c
-// int					simulation_stops(t_thread_context *t_context);
-void						end_threads(t_simulation *sim_data);
-int							is_all_philos_reached_minimum_meals(t_lst *philo_node);
+void						*philo_routine(void *p_node);
+int							is_philos_minimum_meals_done(t_lst *philo_node);
 int							is_philo_dead(t_lst *philo_node);
-int							simulation_stops(t_lst *philo_node);
 
-// states_update.c
+// states_update1.c
 void						update_forks_state(t_lst *philo_node, int state,
 								int left_or_right);
 void						update_philo_meals_count(t_lst *philo_node);
 void						update_philo_last_meal_taken(t_lst *philo_node);
 void						update_all_eaten_min_meals(t_simulation *sim_data,
 								int value);
+
+// states_update2.c
 int							get_sim_stopped(t_simulation *sim_data);
 void						set_sim_stopped(t_simulation *sim_data, int value);
+int							get_all_eaten_min_meals(t_simulation *sim_data);
+void						update_all_eaten_min_meals(t_simulation *sim_data,
+								int value);
+
+// simulation.c
+suseconds_t					time_elapsed_in_sim(suseconds_t start_time,
+								suseconds_t current_time);
+int							simulation_stops(t_lst *philo_node);
+void						start_threads(t_simulation *sim_data);
+void						end_threads(t_simulation *sim_data);
+void						simulation(t_simulation *sim_data);
+
+// utils.c
+suseconds_t					current_time(void);
+void						destroy_philo_mutexes(t_simulation *sim_data);
+void						initialize_philo_mutexes(t_simulation *sim_data);
+int							initialize_philo_list(t_simulation *sim_data,
+								int time_to_die, int eat_duration,
+								int sleep_duration);
+void						free_philo_lst(t_simulation *sim_data,
+								int nr_philos);

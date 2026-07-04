@@ -1,33 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   states_update.c                                    :+:      :+:    :+:   */
+/*   states_update1.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/01 11:46:02 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/03 13:36:44 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/04 13:08:12 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void update_all_eaten_min_meals(t_simulation *sim_data, int value)
-{
-	pthread_mutex_lock(&(sim_data->state_mutex));
-	sim_data->all_eaten_min_meals = value;
-	pthread_mutex_unlock(&(sim_data->state_mutex));
-}
-
 void	update_forks_state(t_lst *philo_node, int state, int left_or_right)
 {
 	if (left_or_right == -1)
 	{
-		philo_node->philo->fork = state;  // left fork state
+		philo_node->philo->fork = state;
 	}
 	else if (left_or_right == 1)
 	{
-		philo_node->next_philo->philo->fork = state;  // right fork state
+		philo_node->next_philo->philo->fork = state;
 	}
 	if (state == 1)
 	{

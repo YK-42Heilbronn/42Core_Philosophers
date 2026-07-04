@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/25 13:14:49 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/03 15:40:09 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/04 14:45:30 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static int	ft_atoi(const char *str, long *val)
 	return (0);
 }
 
-int	ft_satoi(const char *str)
+static int	ft_satoi(const char *str)
 {
 	int		minus;
 	long	result;
@@ -48,15 +48,13 @@ int	ft_satoi(const char *str)
 		return (-1);
 }
 
-int	parse_argv(char *argv[], int *philos, int *die_t, int *eat_t, int *sleep_t)
+// *die_t = ft_satoi(argv[2]);
+// *eat_t = ft_satoi(argv[3]);
+// *sleep_t = ft_satoi(argv[4]);
+int	parse_argv(char *argv[], int ind, int *ptr)
 {
-	*philos = ft_satoi(argv[1]);
-	*die_t = ft_satoi(argv[2]);
-	*eat_t = ft_satoi(argv[3]);
-	*sleep_t = ft_satoi(argv[4]);
-	// *min_meals = ft_satoi(argv[5]);
-	// if philos == 0, then no simulation
-	if (*philos <= 0 || *die_t <= 0 || *eat_t <= 0 || *sleep_t <= 0)
+	*ptr = ft_satoi(argv[ind]);
+	if (*ptr <= 0)
 		return (1);
 	return (0);
 }
