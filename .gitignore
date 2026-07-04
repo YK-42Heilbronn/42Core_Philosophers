@@ -1,7 +1,9 @@
 .docs/
 .examples/
 .excludes/
-philo_exe
+.test/
 .vscode/
+philo/philo
+
 
 
