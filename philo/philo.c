@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/13 13:05:35 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/03 15:23:14 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/03 16:42:47 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,7 +176,13 @@ void	*philo_routine(void *p_node)
 			thinking(philo_node);
 			if (get_sim_stopped(philo_node->philo->sim_data))
 				break;
-			eating(philo_node);
+			if (philo_node->philo->sim_data->philosophers->next_philo == NULL)
+			{
+				single_philo_eating(philo_node);
+				break;
+			}
+			else
+				eating(philo_node);
 		}
 	}
 	return (NULL);
@@ -240,6 +246,7 @@ void	simulation(t_simulation *sim_data)
 	end_threads(sim_data);
 	// printf("sim:end:after\n");
 	destroy_philo_mutexes(sim_data);
+	free_philo_lst(sim_data, sim_data->nr_of_philos);
 	// printf("sim:destroy:after\n");
 }
 
@@ -261,13 +268,15 @@ int	main(int argc, char *argv[])
 			return (1);
 		}
 		sim_data = (t_simulation *)malloc(sizeof(t_simulation));
+		if (sim_data == NULL)
+			return (1);
 		sim_data->nr_of_philos = philos;
 		sim_data->all_eaten_min_meals = 0;
 		sim_data->sim_stopped = 0;
 		if (argc == 6)
 		{
 			min_meals = ft_satoi(argv[5]);
-			if (min_meals == -1)
+			if (min_meals <= 0)
 			{
 				printf("Error: invalid argument\n");
 				return (1);
@@ -277,7 +286,8 @@ int	main(int argc, char *argv[])
 		else
 			sim_data->minimum_meals = 0;
 		sim_data->philosophers = NULL;
-		initialize_philo_list(sim_data, die_t, eat_t, sleep_t);
+		if (!initialize_philo_list(sim_data, die_t, eat_t, sleep_t))
+			return(1);
 		simulation(sim_data);
 		return (0);
 	}

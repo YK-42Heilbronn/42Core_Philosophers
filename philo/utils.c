@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/19 15:08:00 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/03 13:38:56 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/03 16:10:01 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,30 @@ void	print_philo_list(t_simulation *sim_data)
 		// printf("%p - %d\n", philos->philo, philos->philo->nr);
 	}
 }
+static void del_philo(void *philo)
+{
+	free((t_philosopher*)philo);
+}
+void free_philo_lst(t_simulation *sim_data, int nr_philos)
+{
+	t_lst *next;
+	t_lst *node;
+	int philos;
+
+	node = sim_data->philosophers;
+	philos = 0;
+	while (philos++ < nr_philos)
+	{
+		next = node->next_philo;
+		del_philo(node->philo);
+		node->philo = NULL;
+		free(node);
+		node = next;
+	}
+	free(sim_data);
+	sim_data = NULL;
+}
+
 void	destroy_philo_mutexes(t_simulation *sim_data)
 {
 	t_lst	*philo_node;
@@ -156,10 +180,11 @@ void	initialize_philo_mutexes(t_simulation *sim_data)
 // 	}
 // }
 
-void	initialize_philo_list(t_simulation *sim_data, int time_to_die, int eat_duration, int sleep_duration)
+int	initialize_philo_list(t_simulation *sim_data, int time_to_die, int eat_duration, int sleep_duration)
 {
 	t_philosopher	*philo;
 	t_lst *philo_node;
+	t_lst *new_node;
 	int				ind;
 
 	ind = 1;
@@ -168,7 +193,11 @@ void	initialize_philo_list(t_simulation *sim_data, int time_to_die, int eat_dura
 	{
 		// printf("ind: %d\n", ind);
 		philo = (t_philosopher *)malloc(sizeof(t_philosopher));
-		philo->nr = ind++;
+		if (philo == NULL)
+		{
+			free_philo_lst(sim_data, ind);
+			return (0);
+		}
 		philo->fork = 0;
     	philo->meals_count = 0;
 		philo->time_to_eat = eat_duration;
@@ -176,7 +205,15 @@ void	initialize_philo_list(t_simulation *sim_data, int time_to_die, int eat_dura
 		philo->time_to_sleep = sleep_duration;
 		philo->sim_data = sim_data;
 		// printf("philo: %p - %d\n", philo, philo->nr);
-		ft_lstadd_back(&(sim_data->philosophers), new_lst(philo));
+		new_node = new_lst(philo);
+		if (new_node == NULL)
+		{
+			free_philo_lst(sim_data, ind);
+			free(philo);
+			return (0);
+		}
+		philo->nr = ind++;
+		ft_lstadd_back(&(sim_data->philosophers), new_node);
 		// printf("philo: %p - %d\n", philo, philo->nr);
 	}
 	// make linked list cyclic so that last_node next_node is set to first_node
@@ -187,5 +224,6 @@ void	initialize_philo_list(t_simulation *sim_data, int time_to_die, int eat_dura
 			philo_node = philo_node->next_philo;
 		philo_node->next_philo = sim_data->philosophers;
 	}
+	return (1);
 }
 

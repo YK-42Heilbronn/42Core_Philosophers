@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/14 12:18:35 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/03 15:19:27 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/03 16:32:46 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,13 +62,16 @@ suseconds_t					current_time(void);
 void						print_philo_list(t_simulation *sim_data);
 void						destroy_philo_mutexes(t_simulation *sim_data);
 void						initialize_philo_mutexes(t_simulation *sim_data);
-void						initialize_philo_list(t_simulation *sim_data,
+int							initialize_philo_list(t_simulation *sim_data,
 								int time_to_die, int eat_duration,
 								int sleep_duration);
+void						free_philo_lst(t_simulation *sim_data,
+								int nr_philos);
 
 // states.c
 void						fork_taken(t_lst *philo_node);
 void						eating(t_lst *philo_node);
+void						single_philo_eating(t_lst *philo_node);
 void						sleeping(t_lst *philo_node);
 void						thinking(t_lst *philo_node);
 void						died(t_lst *philo_node);

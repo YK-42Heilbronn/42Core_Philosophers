@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/25 13:14:49 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/03 15:29:05 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/03 15:40:09 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	parse_argv(char *argv[], int *philos, int *die_t, int *eat_t, int *sleep_t)
 	*sleep_t = ft_satoi(argv[4]);
 	// *min_meals = ft_satoi(argv[5]);
 	// if philos == 0, then no simulation
-	if (*philos <= 0 || *die_t == -1 || *eat_t == -1 || *sleep_t == -1)
+	if (*philos <= 0 || *die_t <= 0 || *eat_t <= 0 || *sleep_t <= 0)
 		return (1);
 	return (0);
 }
