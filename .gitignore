@@ -3,10 +3,11 @@
 .docs/
 .examples/
 .excludes/
-philo_exe
 .vscode/
 .test/
 philo/threads/
+philo/philo
+philo/objs
 
 # Prerequisites
 *.d
