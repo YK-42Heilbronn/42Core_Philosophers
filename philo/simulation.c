@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/04 11:33:59 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/04 14:32:21 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/05 09:17:19 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int	simulation_stops(t_lst *philo_node)
 		died(philo_node);
 		return (get_sim_stopped(philo->sim_data));
 	}
-	if (is_philos_minimum_meals_done(philo_node))
+	if (are_philos_minimum_meals_done(philo_node))
 	{
 		set_sim_stopped(philo->sim_data, 1);
 		return (get_sim_stopped(philo->sim_data));

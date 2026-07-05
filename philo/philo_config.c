@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/04 12:21:33 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/04 13:28:14 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/05 10:14:19 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	destroy_philo_mutexes(t_simulation *sim_data)
 	pthread_mutex_destroy(&(sim_data->state_mutex));
 	while (nr_philos++ < sim_data->nr_of_philos)
 	{
-		pthread_mutex_destroy(&(philo_node->philo->reserve_resource));
+		pthread_mutex_destroy(&(philo_node->philo->fork_mutex));
 		pthread_mutex_destroy(&(philo_node->philo->meal_mutex));
 		pthread_mutex_destroy(&(philo_node->philo->last_meal_mutex));
 		philo_node = philo_node->next_philo;
@@ -41,7 +41,7 @@ void	initialize_philo_mutexes(t_simulation *sim_data)
 	pthread_mutex_init(&(sim_data->state_mutex), NULL);
 	while (nr_philos++ < sim_data->nr_of_philos)
 	{
-		pthread_mutex_init(&(philo_node->philo->reserve_resource), NULL);
+		pthread_mutex_init(&(philo_node->philo->fork_mutex), NULL);
 		pthread_mutex_init(&(philo_node->philo->meal_mutex), NULL);
 		pthread_mutex_init(&(philo_node->philo->last_meal_mutex), NULL);
 		philo_node = philo_node->next_philo;

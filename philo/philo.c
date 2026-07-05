@@ -6,13 +6,13 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/13 13:05:35 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/04 15:44:42 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/05 09:24:43 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	is_philos_minimum_meals_done(t_lst *philo_node)
+int	are_philos_minimum_meals_done(t_lst *philo_node)
 {
 	t_simulation	*sim_data;
 	t_lst			*nxt_philo;
@@ -26,7 +26,7 @@ int	is_philos_minimum_meals_done(t_lst *philo_node)
 	update_all_eaten_min_meals(sim_data, 1);
 	while (nr_philos++ < sim_data->nr_of_philos)
 	{
-		if (nxt_philo->philo->meals_count < sim_data->minimum_meals)
+		if (get_philo_meals_count(nxt_philo) < sim_data->minimum_meals)
 		{
 			update_all_eaten_min_meals(sim_data, 0);
 			break ;

@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/19 16:19:38 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/04 17:19:38 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/05 13:51:13 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,5 +54,5 @@ void	thinking(t_lst *philo_node)
 		pthread_mutex_unlock(&(philo_node->philo->sim_data->print_mutex));
 	}
 	if (!simulation_stops(philo_node))
-		usleep(10 * 1000);
+		usleep(1 * 1000);
 }

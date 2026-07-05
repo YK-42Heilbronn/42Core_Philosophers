@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/14 12:18:35 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/04 15:43:26 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/05 13:49:55 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ typedef struct s_philosopher
 	int						time_to_sleep;
 	suseconds_t				last_meal_taken;
 
-	pthread_mutex_t			reserve_resource;
+	pthread_mutex_t			fork_mutex;
 	pthread_mutex_t			meal_mutex;
 	pthread_mutex_t			last_meal_mutex;
 
@@ -76,12 +76,13 @@ int							parse_argv(char *argv[], int ind, int *ptr);
 
 // philo.c
 void						*philo_routine(void *p_node);
-int							is_philos_minimum_meals_done(t_lst *philo_node);
+int							are_philos_minimum_meals_done(t_lst *philo_node);
 int							is_philo_dead(t_lst *philo_node);
 
 // states_update1.c
 void						update_forks_state(t_lst *philo_node, int state,
 								int left_or_right);
+int							get_philo_meals_count(t_lst *philo_node);
 void						update_philo_meals_count(t_lst *philo_node);
 void						update_philo_last_meal_taken(t_lst *philo_node);
 void						update_all_eaten_min_meals(t_simulation *sim_data,
