@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/04 11:33:59 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/05 09:17:19 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/05 15:02:27 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,21 +27,26 @@ int	simulation_stops(t_lst *philo_node)
 	t_philosopher	*philo;
 
 	philo = philo_node->philo;
+	pthread_mutex_lock(&(philo->sim_data->stop_mutex));
 	if (get_sim_stopped(philo->sim_data))
 	{
+		pthread_mutex_unlock(&(philo->sim_data->stop_mutex));
 		return (get_sim_stopped(philo->sim_data));
 	}
 	if (is_philo_dead(philo_node))
 	{
-		set_sim_stopped(philo->sim_data, 1);
+		philo->sim_data->sim_stopped = 1;
 		died(philo_node);
+		pthread_mutex_unlock(&(philo->sim_data->stop_mutex));
 		return (get_sim_stopped(philo->sim_data));
 	}
 	if (are_philos_minimum_meals_done(philo_node))
 	{
-		set_sim_stopped(philo->sim_data, 1);
+		philo->sim_data->sim_stopped = 1;
+		pthread_mutex_unlock(&(philo->sim_data->stop_mutex));
 		return (get_sim_stopped(philo->sim_data));
 	}
+	pthread_mutex_unlock(&(philo->sim_data->stop_mutex));
 	return (get_sim_stopped(philo->sim_data));
 }
 

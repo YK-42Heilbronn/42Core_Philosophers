@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/04 12:21:33 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/05 10:14:19 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/05 14:38:14 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ void	destroy_philo_mutexes(t_simulation *sim_data)
 	nr_philos = 0;
 	pthread_mutex_destroy(&(sim_data->print_mutex));
 	pthread_mutex_destroy(&(sim_data->state_mutex));
+	pthread_mutex_destroy(&(sim_data->stop_mutex));
 	while (nr_philos++ < sim_data->nr_of_philos)
 	{
 		pthread_mutex_destroy(&(philo_node->philo->fork_mutex));
@@ -39,6 +40,7 @@ void	initialize_philo_mutexes(t_simulation *sim_data)
 	nr_philos = 0;
 	pthread_mutex_init(&(sim_data->print_mutex), NULL);
 	pthread_mutex_init(&(sim_data->state_mutex), NULL);
+	pthread_mutex_init(&(sim_data->stop_mutex), NULL);
 	while (nr_philos++ < sim_data->nr_of_philos)
 	{
 		pthread_mutex_init(&(philo_node->philo->fork_mutex), NULL);

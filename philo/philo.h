@@ -6,7 +6,7 @@
 /*   By: ykonka <ykonka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/14 12:18:35 by ykonka            #+#    #+#             */
-/*   Updated: 2026/07/05 13:49:55 by ykonka           ###   ########.fr       */
+/*   Updated: 2026/07/05 14:36:56 by ykonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ typedef struct s_simulation
 
 	pthread_mutex_t			state_mutex;
 	pthread_mutex_t			print_mutex;
+	pthread_mutex_t			stop_mutex;
 
 	t_lst					*philosophers;
 }							t_simulation;
