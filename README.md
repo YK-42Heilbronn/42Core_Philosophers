@@ -1,6 +1,6 @@
 *This project has been created as part of the 42 curriculum by ykonka*.
 
-# 42_Heilbronn - Philosophers Project
+# <font color=blue>42_Heilbronn - Philosophers Project</font>
 
 ## Description
 
