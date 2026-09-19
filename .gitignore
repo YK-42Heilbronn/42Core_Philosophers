@@ -4,6 +4,8 @@
 .test/
 .vscode/
 philo/philo
+*.log
+philo
 
 
 
