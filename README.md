@@ -4,7 +4,8 @@
 
 ## Description
 
-* The goal of this project is to simulate the dinning philosophers problem using concurrent programming techniques:
+* The goal of this project is to solve the dinning philosophers problem, a real world simulation of concurrent programming setting.
+* To overcome constraints in the solution space and find a optimistic path of philosopher routine cycle, following techniques are adapted:
 	- resource management
 	- processes synchronization
 	- avoiding race conditions & deadlocks
